@@ -32,6 +32,14 @@
 				<key>modifiersubtext</key>
 				<string>Edit config</string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>E0E14F52-F226-43E3-9429-1882E243B0B3</string>
+				<key>modifiers</key>
+				<integer>262144</integer>
+				<key>modifiersubtext</key>
+				<string>Open Prism location in Finder</string>
+			</dict>
 		</array>
 		<key>A5B4E989-F7CC-44B7-AC39-9B9D2437BB8F</key>
 		<array>
@@ -175,11 +183,47 @@ Workflow().do('edit', '{query}')</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>0</integer>
+				<key>script</key>
+				<string>from alfred_prism import Workflow
+Workflow().do('open', '{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>E0E14F52-F226-43E3-9429-1882E243B0B3</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
-	<string>Use '+' to create a new prism.
-Hold down ALT to delete an existing prism.
-Hold down CMD to edit a prism's config in a text editor.</string>
+	<string>Usage
+-----
+*  Use '+' to create a new prism.
+* Hold down Alt to delete an existing prism.
+* Hold down Cmd to edit a prism's config.
+* Hold down Ctrl to open a prism in Finder.
+
+Prism Config
+------------
+Prisms are configured with a simple JSON file. Currently, the only parameters are the name of the prism, a description, and a list of command line options that should be passed to Chrome.
+
+Each entry in the options list should be a single command line option to Chrome, along with any arguments it takes, e.g.:
+
+  options: ["--allow-file-access-from-files", "--country US"]
+
+The options --no-first-run and --user-data-dir are always used, but are not listed in the config file. An up-to-date list of the available command line operations can be found at http://peter.sh/experiments/chromium-command-line-switches/.
+
+Credits
+-------
+The idea for a Chrome instance manager came from Jeremy Mack (https://github.com/mutewinter).
+The icon was created by Ethan Muller (http://dribbble.com/shots/951015-Chrome-Prism-Icon?list=tags&amp;tag=chrome).</string>
 	<key>uidata</key>
 	<dict>
 		<key>11FEE59A-B850-4534-8124-83F5C34F913B</key>
@@ -206,6 +250,11 @@ Hold down CMD to edit a prism's config in a text editor.</string>
 		<dict>
 			<key>ypos</key>
 			<real>10</real>
+		</dict>
+		<key>E0E14F52-F226-43E3-9429-1882E243B0B3</key>
+		<dict>
+			<key>ypos</key>
+			<real>370</real>
 		</dict>
 	</dict>
 	<key>webaddress</key>
