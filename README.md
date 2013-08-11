@@ -43,8 +43,8 @@ Alternatively, you can change the `weather` command to something else.
 Requirements
 ------------
 
-The only requirement is Python 2.7+. If you have Lion or Mountain Lion, you're
-good.
+The only requirements are Python 2.7 (standard on Lion and Mountain Lion) and
+Chrome.
 
 Credits
 -------
