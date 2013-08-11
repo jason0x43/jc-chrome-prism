@@ -10,7 +10,7 @@
 # Prisms are stored in random directories defined at creation time.
 
 
-import jalf
+import jcalfred
 import json
 import logging
 import os.path
@@ -131,7 +131,7 @@ class Prism(object):
         shutil.rmtree(self.cache_dir)
 
 
-class Workflow(jalf.AlfredWorkflow):
+class Workflow(jcalfred.AlfredWorkflow):
     def _load_config(self, prism_name):
         cfg_file = os.path.join(self.data_dir, '{}.json'.format(prism_name))
         with open(cfg_file, 'r') as cf:
@@ -150,9 +150,9 @@ class Workflow(jalf.AlfredWorkflow):
     def _load_help(self):
         '''Load help items from the readme.'''
         items = []
-        message = jalf.BUNDLE_INFO['readme']
+        message = jcalfred.BUNDLE_INFO['readme']
         for line in [n for n in message.split('\n') if n.startswith('* ')]:
-            items.append(jalf.Item(line[2:]))
+            items.append(jcalfred.Item(line[2:]))
         return items
 
     def tell_list(self, query=None):
@@ -169,13 +169,14 @@ class Workflow(jalf.AlfredWorkflow):
                 prism_name, sep, desc = prism_name.partition(' ')
 
             if prism_name:
-                items.append(jalf.Item('Create a new prism "{}"...'.format(
-                                       prism_name), arg=query, valid=True))
+                items.append(jcalfred.Item(
+                    'Create a new prism "{}"...'.format(prism_name),
+                    arg=query, valid=True))
                 if desc:
                     items[-1].subtitle = desc
             else:
-                items.append(jalf.Item('Create a new prism...', arg='+',
-                                       valid=True))
+                items.append(jcalfred.Item('Create a new prism...', arg='+',
+                                           valid=True))
 
         elif query.startswith('?'):
             items += self._load_help()
@@ -185,15 +186,15 @@ class Workflow(jalf.AlfredWorkflow):
             for prism in prisms:
                 LOG.debug('adding item for "{}"'.format(prism.pid))
                 name = prism.name
-                items.append(jalf.Item(name, arg=prism.pid, valid=True))
+                items.append(jcalfred.Item(name, arg=prism.pid, valid=True))
                 if prism.description:
                     items[-1].subtitle = prism.description
             if query:
-                items = jalf.fuzzy_match_list(query, items,
-                                              key=lambda x: x.title)
+                items = jcalfred.fuzzy_match_list(query, items,
+                                                  key=lambda x: x.title)
 
         if len(items) == 0:
-            items.append(jalf.Item('No prisms found'))
+            items.append(jcalfred.Item('No prisms found'))
 
         return items
 
@@ -203,7 +204,7 @@ class Workflow(jalf.AlfredWorkflow):
 
         if not prism_name:
             LOG.debug('no prism name given')
-            btn, prism_name = jalf.get_from_user(
+            btn, prism_name = jcalfred.get_from_user(
                 'Prism name', 'Give a name for this prism. The name may not '
                 'contain spaces. You may add a description after the name '
                 '(e.g. myPrism This is a flashy prism)')
@@ -245,10 +246,10 @@ class Workflow(jalf.AlfredWorkflow):
     def do_delete(self, pid):
         '''Delete an existing prism.'''
         prism = Prism(self, pid=pid)
-        answer = jalf.get_confirmation('Delete prism',
-                                       'Are you sure you want to delete '
-                                       '{}?'.format(prism),
-                                       default='Yes')
+        answer = jcalfred.get_confirmation('Delete prism',
+                                           'Are you sure you want to delete '
+                                           '{}?'.format(prism),
+                                           default='Yes')
         LOG.debug('got answer: %s', answer)
         if answer != 'Yes':
             return
@@ -267,8 +268,8 @@ class Workflow(jalf.AlfredWorkflow):
             self.do_create(prism_name)
         elif pid == '?':
             LOG.debug('showing help')
-            message = jalf.BUNDLE_INFO['readme']
-            jalf.show_message('Chrome Prism Help', message)
+            message = jcalfred.BUNDLE_INFO['readme']
+            jcalfred.show_message('Chrome Prism Help', message)
         else:
             LOG.debug('starting prism %s', pid)
             Prism(self, pid=pid).start()

@@ -43,8 +43,9 @@ Alternatively, you can change the `weather` command to something else.
 Requirements
 ------------
 
-The only requirements are Python 2.7 (standard on Lion and Mountain Lion) and
-Chrome.
+* Python 2.7 (standard on Lion and Mountain Lion)
+* Chrome
+* My [jcalfred][jcalfred] python library (included in the workflow download)
 
 Credits
 -------
@@ -56,5 +57,6 @@ Muller][ethan].
 [pkg]: https://dl.dropbox.com/s/xkwm3vlryhacfya/jc-chrome-prism.alfredworkflow
 [img]: https://dl.dropbox.com/s/iy5bfl3bv2u5o62/jc-chrome-prism_screenshot.png
 [alfred]: http://www.alfredapp.com
+[jcalfred]: https://github.com/jason0x43/jcalfred
 [jeremy]: https://github.com/mutewinter
 [ethan]: http://dribbble.com/shots/951015-Chrome-Prism-Icon?list=tags&tag=chrome
