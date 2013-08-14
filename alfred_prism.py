@@ -58,11 +58,9 @@ class Prism(object):
             self.options = config.get('options', self.options)
 
     def save_config(self):
-        config = {}
+        config = {'name': self.name, 'options': self.options}
         if self.description:
             config['description'] = self.description
-            config['name'] = self.name
-            config['options'] = self.options
         with open(self.conf_file, 'wt') as cf:
             json.dump(config, cf, indent=2)
 
@@ -143,8 +141,14 @@ class Workflow(jcalfred.AlfredWorkflow):
         prisms = []
         apps = [a for a in os.listdir(self.data_dir) if a.endswith('.app')]
         for app in apps:
-            name = app[:-4]
-            prisms.append(Prism(self, pid=name))
+            pid = app[:-4]
+            try:
+                prisms.append(Prism(self, pid=pid))
+            except Exception:
+                prism = Prism(self, name=pid, pid=pid)
+                prism.description = (u"I don't have a name – edit my "
+                                     u'config to fix me')
+                prisms.append(prism)
         return prisms
 
     def _load_help(self):
