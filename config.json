@@ -1,1 +1,6 @@
-{"loglevel":"INFO"}
+{
+  "loglevel":"INFO",
+  "dependencies":[
+    "jcalfred"
+  ]
+}

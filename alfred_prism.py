@@ -154,7 +154,7 @@ class Workflow(jcalfred.AlfredWorkflow):
     def _load_help(self):
         '''Load help items from the readme.'''
         items = []
-        message = jcalfred.BUNDLE_INFO['readme']
+        message = self.bundle_info['readme']
         for line in [n for n in message.split('\n') if n.startswith('* ')]:
             items.append(jcalfred.Item(line[2:]))
         return items
@@ -194,8 +194,8 @@ class Workflow(jcalfred.AlfredWorkflow):
                 if prism.description:
                     items[-1].subtitle = prism.description
             if query:
-                items = jcalfred.fuzzy_match_list(query, items,
-                                                  key=lambda x: x.title)
+                items = self.fuzzy_match_list(query, items,
+                                              key=lambda x: x.title)
 
         if len(items) == 0:
             items.append(jcalfred.Item('No prisms found'))
@@ -208,7 +208,7 @@ class Workflow(jcalfred.AlfredWorkflow):
 
         if not prism_name:
             LOG.debug('no prism name given')
-            btn, prism_name = jcalfred.get_from_user(
+            btn, prism_name = self.get_from_user(
                 'Prism name', 'Give a name for this prism. The name may not '
                 'contain spaces. You may add a description after the name '
                 '(e.g. myPrism This is a flashy prism)')
@@ -250,10 +250,10 @@ class Workflow(jcalfred.AlfredWorkflow):
     def do_delete(self, pid):
         '''Delete an existing prism.'''
         prism = Prism(self, pid=pid)
-        answer = jcalfred.get_confirmation('Delete prism',
-                                           'Are you sure you want to delete '
-                                           '{}?'.format(prism),
-                                           default='Yes')
+        answer = self.get_confirmation('Delete prism',
+                                       'Are you sure you want to delete '
+                                       '{}?'.format(prism),
+                                       default='Yes')
         LOG.debug('got answer: %s', answer)
         if answer != 'Yes':
             return
@@ -272,8 +272,8 @@ class Workflow(jcalfred.AlfredWorkflow):
             self.do_create(prism_name)
         elif pid == '?':
             LOG.debug('showing help')
-            message = jcalfred.BUNDLE_INFO['readme']
-            jcalfred.show_message('Chrome Prism Help', message)
+            message = self.bundle_info['readme']
+            self.show_message('Chrome Prism Help', message)
         else:
             LOG.debug('starting prism %s', pid)
             Prism(self, pid=pid).start()
