@@ -64,10 +64,14 @@ class Prism(object):
         with open(self.conf_file, 'wt') as cf:
             json.dump(config, cf, indent=2)
 
-    def start(self):
+    def start(self, url=None):
         # rebuild the run script to agree with the current config
         self.build_script()
-        Popen(['open', self.app_dir])
+        cmd = ['open', self.app_dir]
+        if url:
+            cmd += ['--args', url]
+        LOG.debug('running command: %s', cmd)
+        Popen(cmd)
 
     def exists(self):
         return os.path.exists(self.app_dir)
@@ -85,7 +89,8 @@ class Prism(object):
             for opt in self.options:
                 sf.write("  {} \\\n".format(opt))
 
-            sf.write("  --user-data-dir='{}'\n".format(self.cache_dir))
+            sf.write("  --user-data-dir='{}' \\\n".format(self.cache_dir))
+            sf.write('  $@\n')
         os.chmod(script, 0744)
 
     def create(self):
@@ -186,16 +191,29 @@ class Workflow(jcalfred.AlfredWorkflow):
             items += self._load_help()
 
         else:
-            prisms = self._get_prisms()
-            for prism in prisms:
+            for prism in self._get_prisms():
                 LOG.debug('adding item for "{}"'.format(prism.pid))
                 name = prism.name
                 items.append(jcalfred.Item(name, arg=prism.pid, valid=True))
                 if prism.description:
                     items[-1].subtitle = prism.description
+
             if query:
-                items = self.fuzzy_match_list(query, items,
-                                              key=lambda x: x.title)
+                query = query.lstrip()
+                parts = query.split()
+                LOG.debug('query parts: %s', parts)
+                name = parts[0].strip()
+                if ' ' in query:
+                    items = [i for i in items if i.title == name]
+                    if len(items) > 0:
+                        item = items[0]
+                        if len(parts) > 1:
+                            item.arg += '|' + parts[1].strip()
+                        LOG.debug('item arg: %s', item.arg)
+                        items = [item]
+                else:
+                    items = self.fuzzy_match_list(name, items,
+                                                  key=lambda x: x.title)
 
         if len(items) == 0:
             items.append(jcalfred.Item('No prisms found'))
@@ -262,9 +280,15 @@ class Workflow(jcalfred.AlfredWorkflow):
         prism.delete()
         self.puts('Deleted prism {}'.format(prism.name))
 
-    def do_start(self, pid=None):
+    def do_start(self, arg=None):
         '''Start the named prism.'''
-        LOG.debug('do_start()')
+        LOG.debug('do_start(%s)', arg)
+
+        if '|' in arg:
+            pid, url = arg.split('|')
+        else:
+            pid = arg
+            url = None
 
         if pid.startswith('+'):
             LOG.debug('creating a prism')
@@ -276,7 +300,7 @@ class Workflow(jcalfred.AlfredWorkflow):
             self.show_message('Chrome Prism Help', message)
         else:
             LOG.debug('starting prism %s', pid)
-            Prism(self, pid=pid).start()
+            Prism(self, pid=pid).start(url)
 
 
 if __name__ == '__main__':
