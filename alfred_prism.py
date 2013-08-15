@@ -36,7 +36,7 @@ class Prism(object):
         self.name = name
         self.pid = pid
         self.description = description
-        self.app_dir = os.path.join(workflow.data_dir, '{}.app'.format(pid))
+        self.app_dir = os.path.join(workflow.data_dir, '%s.app' % pid)
         self.conf_file = os.path.join(self.app_dir, 'prism.json')
         self.cache_dir = os.path.join(workflow.cache_dir, pid)
         self.options = []
@@ -83,23 +83,22 @@ class Prism(object):
 
         with open(script, 'wt') as sf:
             sf.write('#!/bin/sh\n')
-            sf.write('exec "{}" \\\n'.format(CHROME_EXE))
+            sf.write('exec "%s" \\\n' % CHROME_EXE)
             sf.write('  --no-first-run \\\n')
 
             for opt in self.options:
-                sf.write("  {} \\\n".format(opt))
+                sf.write("  %s \\\n" % opt)
 
-            sf.write("  --user-data-dir='{}' \\\n".format(self.cache_dir))
+            sf.write("  --user-data-dir='%s' \\\n" % self.cache_dir)
             sf.write('  $@\n')
         os.chmod(script, 0744)
 
     def create(self):
         '''Create this prism.'''
         if os.path.exists(self.app_dir):
-            raise Exception('App dir for {} already exists'.format(self.name))
+            raise Exception('App dir for %s already exists' % self.name)
         if os.path.exists(self.app_dir):
-            raise Exception('Cache dir for {} already exists'.format(
-                            self.name))
+            raise Exception('Cache dir for %s already exists' % self.name)
 
         os.mkdir(self.app_dir)
         os.mkdir(self.cache_dir)
@@ -110,7 +109,7 @@ class Prism(object):
         with open(plfile, 'r') as template:
             plist_tmpl = template.read()
 
-        bundle_id = '{}.{}'.format(self.workflow.bundle_id, self.name)
+        bundle_id = '%s.%s' % (self.workflow.bundle_id, self.name)
         plist = plist_tmpl.format(bundle_name='Chrome Prism',
                                   bundle_id=bundle_id)
 
@@ -136,7 +135,7 @@ class Prism(object):
 
 class Workflow(jcalfred.AlfredWorkflow):
     def _load_config(self, prism_name):
-        cfg_file = os.path.join(self.data_dir, '{}.json'.format(prism_name))
+        cfg_file = os.path.join(self.data_dir, '%s.json' % prism_name)
         with open(cfg_file, 'r') as cf:
             data = json.load(cf)
         return data
@@ -179,7 +178,7 @@ class Workflow(jcalfred.AlfredWorkflow):
 
             if prism_name:
                 items.append(jcalfred.Item(
-                    'Create a new prism "{}"...'.format(prism_name),
+                    'Create a new prism "%s"...' % prism_name,
                     arg=query, valid=True))
                 if desc:
                     items[-1].subtitle = desc
@@ -192,7 +191,7 @@ class Workflow(jcalfred.AlfredWorkflow):
 
         else:
             for prism in self._get_prisms():
-                LOG.debug('adding item for "{}"'.format(prism.pid))
+                LOG.debug('adding item for "%s"', prism.pid)
                 name = prism.name
                 items.append(jcalfred.Item(name, arg=prism.pid, valid=True))
                 if prism.description:
@@ -240,20 +239,19 @@ class Workflow(jcalfred.AlfredWorkflow):
 
         prism_app = Prism(self, name=prism_name, description=desc)
         if prism_app.exists():
-            raise Exception('A prism named {} already exists'.format(
-                            prism_name))
+            raise Exception('A prism named %s already exists' % prism_name)
 
         LOG.debug('creating prism %s', prism_name)
         prism_app.create()
 
-        self.puts('Created prism {}'.format(prism_name))
+        self.puts('Created prism %s' % prism_name)
 
     def do_edit(self, pid):
         '''Edit a prism config.'''
         LOG.debug('editing prism %s', pid)
         prism = Prism(self, pid=pid)
         if not prism.exists():
-            raise Exception('There is no prism with id {}'.format(pid))
+            raise Exception('There is no prism with id %s' % pid)
         LOG.debug('opening prism conf file at %s', prism.conf_file)
         Popen(['open', prism.conf_file])
 
@@ -262,7 +260,7 @@ class Workflow(jcalfred.AlfredWorkflow):
         LOG.debug('opening prism %s', pid)
         prism = Prism(self, pid=pid)
         if not prism.exists():
-            raise Exception('There is no prism with id {}'.format(pid))
+            raise Exception('There is no prism with id %s' % pid)
         Popen(['open', '-R', prism.conf_file])
 
     def do_delete(self, pid):
@@ -270,15 +268,14 @@ class Workflow(jcalfred.AlfredWorkflow):
         prism = Prism(self, pid=pid)
         answer = self.get_confirmation('Delete prism',
                                        'Are you sure you want to delete '
-                                       '{}?'.format(prism),
-                                       default='Yes')
+                                       '%s?' % prism, default='Yes')
         LOG.debug('got answer: %s', answer)
         if answer != 'Yes':
             return
 
         LOG.debug('deleting prism %s', pid)
         prism.delete()
-        self.puts('Deleted prism {}'.format(prism.name))
+        self.puts('Deleted prism %s' % prism.name)
 
     def do_start(self, arg=None):
         '''Start the named prism.'''
