@@ -16,7 +16,6 @@ import logging
 import os.path
 import os
 import shutil
-import uuid
 from subprocess import Popen
 
 
@@ -26,39 +25,32 @@ CHROME_EXE = 'Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 
 class Prism(object):
-    def __init__(self, workflow, name=None, pid=None, description=None):
-        if not pid and not name:
-            raise Exception('Workflow must have a pid or name')
-        if not pid:
-            pid = str(uuid.uuid4())
-
+    def __init__(self, workflow, name, description=None):
         self.workflow = workflow
-        self.name = name
-        self.pid = pid
         self.description = description
-        self.app_dir = os.path.join(workflow.data_dir, '%s.app' % pid)
-        self.conf_file = os.path.join(self.app_dir, 'prism.json')
-        self.cache_dir = os.path.join(workflow.cache_dir, pid)
+        self._set_name(name)
         self.options = []
 
         if os.path.exists(self.conf_file):
             self.load_config()
 
-        if not self.name:
-            raise Exception('No name specified or in config file')
-
     def __str__(self):
         return self.name
+
+    def _set_name(self, name):
+        self.name = name
+        self.app_dir = os.path.join(self.workflow.data_dir, '%s.app' % name)
+        self.conf_file = os.path.join(self.app_dir, 'prism.json')
+        self.cache_dir = os.path.join(self.workflow.cache_dir, name)
 
     def load_config(self):
         with open(self.conf_file, 'r') as cf:
             config = json.load(cf)
             self.description = config.get('description', self.description)
-            self.name = config.get('name', self.name)
             self.options = config.get('options', self.options)
 
     def save_config(self):
-        config = {'name': self.name, 'options': self.options}
+        config = {'options': self.options}
         if self.description:
             config['description'] = self.description
         with open(self.conf_file, 'wt') as cf:
@@ -127,6 +119,14 @@ class Prism(object):
         icon_file = os.path.join(PLUGIN_DIR, 'resources', 'icon.icns')
         shutil.copy(icon_file, res_dir)
 
+    def rename(self, new_name):
+        '''Rename this prism'''
+        old_app_dir = self.app_dir
+        old_cache_dir = self.cache_dir
+        self._set_name(new_name)
+        os.rename(old_app_dir, self.app_dir)
+        os.rename(old_cache_dir, self.cache_dir)
+
     def delete(self):
         '''Delete this prism.'''
         shutil.rmtree(self.app_dir)
@@ -145,14 +145,8 @@ class Workflow(jcalfred.AlfredWorkflow):
         prisms = []
         apps = [a for a in os.listdir(self.data_dir) if a.endswith('.app')]
         for app in apps:
-            pid = app[:-4]
-            try:
-                prisms.append(Prism(self, pid=pid))
-            except Exception:
-                prism = Prism(self, name=pid, pid=pid)
-                prism.description = (u"I don't have a name – edit my "
-                                     u'config to fix me')
-                prisms.append(prism)
+            name = app[:-4]
+            prisms.append(Prism(self, name))
         return prisms
 
     def _load_help(self):
@@ -191,9 +185,9 @@ class Workflow(jcalfred.AlfredWorkflow):
 
         else:
             for prism in self._get_prisms():
-                LOG.debug('adding item for "%s"', prism.pid)
+                LOG.debug('adding item for "%s"', prism)
                 name = prism.name
-                items.append(jcalfred.Item(name, arg=prism.pid, valid=True))
+                items.append(jcalfred.Item(name, arg=prism.name, valid=True))
                 if prism.description:
                     items[-1].subtitle = prism.description
 
@@ -246,26 +240,43 @@ class Workflow(jcalfred.AlfredWorkflow):
 
         self.puts('Created prism %s' % prism_name)
 
-    def do_edit(self, pid):
+    def do_edit(self, name):
         '''Edit a prism config.'''
-        LOG.debug('editing prism %s', pid)
-        prism = Prism(self, pid=pid)
+        prism = Prism(self, name)
+        LOG.debug('editing prism %s', prism)
         if not prism.exists():
-            raise Exception('There is no prism with id %s' % pid)
+            raise Exception('There is no prism named %s' % name)
         LOG.debug('opening prism conf file at %s', prism.conf_file)
         Popen(['open', prism.conf_file])
 
-    def do_open(self, pid):
+    def do_open(self, name):
         '''Open a prism in Finder.'''
-        LOG.debug('opening prism %s', pid)
-        prism = Prism(self, pid=pid)
+        prism = Prism(self, name)
+        LOG.debug('opening prism %s', prism)
         if not prism.exists():
-            raise Exception('There is no prism with id %s' % pid)
+            raise Exception('There is no prism named %s' % name)
         Popen(['open', '-R', prism.conf_file])
 
-    def do_delete(self, pid):
+    def do_rename(self, name):
         '''Delete an existing prism.'''
-        prism = Prism(self, pid=pid)
+        prism = Prism(self, name)
+        while True:
+            btn, answer = self.get_from_user('Rename %s' % prism, 'New name')
+            if btn == 'Cancel':
+                return
+            new_name = answer.strip()
+            if ' ' in new_name:
+                self.show_message('Prism names may not contain spaces')
+                continue
+            LOG.debug('renaming prism %s to %s', prism, new_name)
+            old_name = prism.name
+            prism.rename(new_name)
+            self.puts('Renamed prism %s to %s' % (old_name, new_name))
+            break
+
+    def do_delete(self, name):
+        '''Delete an existing prism.'''
+        prism = Prism(self, name)
         answer = self.get_confirmation('Delete prism',
                                        'Are you sure you want to delete '
                                        '%s?' % prism, default='Yes')
@@ -273,31 +284,31 @@ class Workflow(jcalfred.AlfredWorkflow):
         if answer != 'Yes':
             return
 
-        LOG.debug('deleting prism %s', pid)
+        LOG.debug('deleting prism %s', prism)
         prism.delete()
-        self.puts('Deleted prism %s' % prism.name)
+        self.puts('Deleted prism %s' % prism)
 
     def do_start(self, arg=None):
         '''Start the named prism.'''
         LOG.debug('do_start(%s)', arg)
 
         if '|' in arg:
-            pid, url = arg.split('|')
+            name, url = arg.split('|')
         else:
-            pid = arg
+            name = arg
             url = None
 
-        if pid.startswith('+'):
+        if name.startswith('+'):
             LOG.debug('creating a prism')
-            prism_name = pid[1:].strip()
+            prism_name = name[1:].strip()
             self.do_create(prism_name)
-        elif pid == '?':
+        elif name == '?':
             LOG.debug('showing help')
             message = self.bundle_info['readme']
             self.show_message('Chrome Prism Help', message)
         else:
-            LOG.debug('starting prism %s', pid)
-            Prism(self, pid=pid).start(url)
+            LOG.debug('starting prism %s', name)
+            Prism(self, name).start(url)
 
 
 if __name__ == '__main__':

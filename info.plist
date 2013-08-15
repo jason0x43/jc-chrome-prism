@@ -40,6 +40,14 @@
 				<key>modifiersubtext</key>
 				<string>Open Prism location in Finder</string>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>DB57A4E2-25F1-49A9-9FDA-E6F3721372C9</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string>Rename this Prism</string>
+			</dict>
 		</array>
 		<key>A5B4E989-F7CC-44B7-AC39-9B9D2437BB8F</key>
 		<array>
@@ -63,6 +71,17 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>DB57A4E2-25F1-49A9-9FDA-E6F3721372C9</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CB713C7B-8340-419E-B21C-BC73E213C27A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 	</dict>
 	<key>createdby</key>
 	<string>Jason Cheatham</string>
@@ -74,31 +93,6 @@
 	<string>Chrome Prism</string>
 	<key>objects</key>
 	<array>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>lastpathcomponent</key>
-				<false/>
-				<key>onlyshowifquerypopulated</key>
-				<true/>
-				<key>output</key>
-				<integer>0</integer>
-				<key>removeextension</key>
-				<false/>
-				<key>sticky</key>
-				<false/>
-				<key>text</key>
-				<string>{query}</string>
-				<key>title</key>
-				<string>Chrome Prism</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.output.notification</string>
-			<key>uid</key>
-			<string>CB713C7B-8340-419E-B21C-BC73E213C27A</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -144,6 +138,31 @@ Workflow().tell('list', '{query}')</string>
 			<string>alfred.workflow.input.scriptfilter</string>
 			<key>uid</key>
 			<string>9FC01494-DA47-41A5-91A4-104212995F5E</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<true/>
+				<key>output</key>
+				<integer>0</integer>
+				<key>removeextension</key>
+				<false/>
+				<key>sticky</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>Chrome Prism</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>CB713C7B-8340-419E-B21C-BC73E213C27A</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
@@ -201,6 +220,24 @@ Workflow().do('open', '{query}')</string>
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>from alfred_prism import Workflow
+Workflow().do('rename', '{query}')</string>
+				<key>type</key>
+				<integer>3</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>DB57A4E2-25F1-49A9-9FDA-E6F3721372C9</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>Usage
@@ -209,6 +246,7 @@ Workflow().do('open', '{query}')</string>
 * Hold down Alt to delete an existing prism.
 * Hold down Cmd to edit a prism's config.
 * Hold down Ctrl to open a prism in Finder.
+* Hold down Shift to rename a prism.
 
 Prism Config
 ------------
@@ -250,6 +288,11 @@ The icon was created by Ethan Muller (http://dribbble.com/shots/951015-Chrome-Pr
 		<dict>
 			<key>ypos</key>
 			<real>10</real>
+		</dict>
+		<key>DB57A4E2-25F1-49A9-9FDA-E6F3721372C9</key>
+		<dict>
+			<key>ypos</key>
+			<real>490</real>
 		</dict>
 		<key>E0E14F52-F226-43E3-9429-1882E243B0B3</key>
 		<dict>
