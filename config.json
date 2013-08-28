@@ -1,6 +1,6 @@
 {
   "loglevel":"INFO",
-  "dependencies":[
-    "jcalfred"
-  ]
+  "dependencies":{
+    "jcalfred":"20130828.0"
+  }
 }
