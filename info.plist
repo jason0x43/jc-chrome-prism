@@ -242,7 +242,7 @@ Workflow().do('rename', '{query}')</string>
 	<key>readme</key>
 	<string>Usage
 -----
-*  Use '+' to create a new prism.
+* Type '+' to create a new prism.
 * Hold down Alt to delete an existing prism.
 * Hold down Cmd to edit a prism's config.
 * Hold down Ctrl to open a prism in Finder.

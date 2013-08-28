@@ -133,7 +133,7 @@ class Prism(object):
         shutil.rmtree(self.cache_dir)
 
 
-class Workflow(jcalfred.AlfredWorkflow):
+class Workflow(jcalfred.Workflow):
     def _load_config(self, prism_name):
         cfg_file = os.path.join(self.data_dir, '%s.json' % prism_name)
         with open(cfg_file, 'r') as cf:
@@ -152,7 +152,7 @@ class Workflow(jcalfred.AlfredWorkflow):
     def _load_help(self):
         '''Load help items from the readme.'''
         items = []
-        message = self.bundle_info['readme']
+        message = self.info.readme
         for line in [n for n in message.split('\n') if n.startswith('* ')]:
             items.append(jcalfred.Item(line[2:]))
         return items
@@ -210,6 +210,8 @@ class Workflow(jcalfred.AlfredWorkflow):
 
         if len(items) == 0:
             items.append(jcalfred.Item('No prisms found'))
+            items.append(jcalfred.Item("Type '+' to create a new prism"))
+            items.append(jcalfred.Item("Type '?' for more help"))
 
         return items
 
@@ -304,7 +306,7 @@ class Workflow(jcalfred.AlfredWorkflow):
             self.do_create(prism_name)
         elif name == '?':
             LOG.debug('showing help')
-            message = self.bundle_info['readme']
+            message = self.info.readme
             self.show_message('Chrome Prism Help', message)
         else:
             LOG.debug('starting prism %s', name)
