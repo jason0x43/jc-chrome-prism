@@ -21,7 +21,7 @@ from subprocess import Popen
 
 LOG = logging.getLogger(__name__)
 PLUGIN_DIR = os.path.dirname(__file__)
-CHROME_EXE = 'Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+CHROME_EXE = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 
 class Prism(object):
