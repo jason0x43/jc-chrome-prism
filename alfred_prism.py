@@ -24,6 +24,19 @@ PLUGIN_DIR = os.path.dirname(__file__)
 CHROME_EXE = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
 
+def load_commented_json(json_file):
+    '''Load a JSON file containing JavaScript-style line comments ('//')'''
+    data = [n for n in json_file.readlines() if not
+            n.lstrip().startswith('//')]
+    return json.loads(''.join(data))
+
+
+def write_instructions(json_file):
+    with open('conf_instructions.txt') as conf_instr:
+        instructions = conf_instr.read()
+    json_file.write(instructions)
+
+
 class Prism(object):
     def __init__(self, workflow, name, description=None):
         self.workflow = workflow
@@ -45,7 +58,7 @@ class Prism(object):
 
     def load_config(self):
         with open(self.conf_file, 'r') as cf:
-            config = json.load(cf)
+            config = load_commented_json(cf)
             self.description = config.get('description', self.description)
             self.options = config.get('options', self.options)
 
@@ -54,6 +67,7 @@ class Prism(object):
         if self.description:
             config['description'] = self.description
         with open(self.conf_file, 'wt') as cf:
+            write_instructions(cf)
             json.dump(config, cf, indent=2)
 
     def start(self, url=None):

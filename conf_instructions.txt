@@ -1,0 +1,10 @@
+// Chrome Prism currently only pays attention to two fields:
+//
+//   options:     an array of command line options
+//   description: a short description of the prism
+//
+// Everything in the options array is simply concatenated (separated by spaces)
+// to make a command line. So to start a prism in incognito mode at google,
+// your options array could be:
+//
+//    "options": ["--incognito", "www.google.com"]
