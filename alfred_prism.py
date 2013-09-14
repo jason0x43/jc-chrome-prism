@@ -77,12 +77,10 @@ class Prism(object):
             sf.write('#!/bin/sh\n')
             sf.write('exec "%s" \\\n' % CHROME_EXE)
             sf.write('  --no-first-run \\\n')
-
+            sf.write("  --user-data-dir='%s'" % self.cache_dir)
             for opt in self.options:
-                sf.write("  %s \\\n" % opt)
-
-            sf.write("  --user-data-dir='%s' \\\n" % self.cache_dir)
-            sf.write('  $@\n')
+                sf.write(" \\\n  %s" % opt)
+            sf.write('\n')
         os.chmod(script, 0744)
 
     def create(self):
