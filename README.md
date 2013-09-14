@@ -28,6 +28,14 @@ There is only one command: `prism` (I like to keep things simple).
   * Hold Option to delete the prism
   * Hold Ctrl to open the prism's app directory in Finder
 
+The configuration file currently only has 2 options (you can put whatever you
+want in there; extra fields will be ignored): `options` and `description`. The
+`options` field is a list of command line options that will be applied when the
+prism is started. The `descripotion` field is a short description that shows up
+as the subtitle for the prism in the Alfred listing.
+
+[Chrome command line options][options]
+
 Installation
 ------------
 
@@ -60,3 +68,5 @@ Muller][ethan].
 [jcalfred]: https://github.com/jason0x43/jcalfred
 [jeremy]: https://github.com/mutewinter
 [ethan]: http://dribbble.com/shots/951015-Chrome-Prism-Icon?list=tags&tag=chrome
+[options]: http://peter.sh/experiments/chromium-command-line-switches/
+
